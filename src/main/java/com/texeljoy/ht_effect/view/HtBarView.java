@@ -353,7 +353,7 @@ public class HtBarView extends LinearLayout implements SeekBar.OnSeekBarChangeLi
           break;
       }
 
-      //精细磨皮和精准磨皮冲突，二者选其一
+      //精细磨皮和精细磨皮冲突，二者选其一
       if (HtState.getCurrentBeautySkin() == HtBeautyKey.precise_blurriness) {
         HtUICacheUtils.beautySkinValue(HtBeautyKey.vague_blurriness, 0);
       }
