@@ -82,6 +82,18 @@ public class HtResetDialog extends DialogFragment {
 
         }
 
+        if (HtState.currentViewState == HTViewState.PORTRAIT) {
+          //当前是绿幕
+          HtUICacheUtils.resetGreencreenValue(getContext());
+          HtUICacheUtils.greenscreenResetEnable(false);
+
+          //通知刷新列表
+          RxBus.get().post(HTEventAction.ACTION_SYNC_RESET, "true");
+
+          //通知更新滑动条显示状态
+          RxBus.get().post(HTEventAction.ACTION_SYNC_PROGRESS, "");
+        }
+
         dismiss();
       }
     });

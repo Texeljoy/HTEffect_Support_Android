@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import com.hwangjr.rxbus.annotation.Subscribe;
 import com.hwangjr.rxbus.annotation.Tag;
 import com.hwangjr.rxbus.thread.EventThread;
@@ -33,6 +34,8 @@ public class HtGestureFrameFragment extends HtBaseFragment {
     private IndicatorViewPager.IndicatorFragmentPagerAdapter fragmentPagerAdapter;
     private View container;
     private View line;
+    private View divide;
+    private ImageView ivClean;
 
     private final List<String> htTabs = new ArrayList<>();
 
@@ -46,6 +49,11 @@ public class HtGestureFrameFragment extends HtBaseFragment {
         indicatorView = view.findViewById(R.id.indicatorView);
         container = view.findViewById(R.id.container);
         line = view.findViewById(R.id.line);
+        divide = view.findViewById(R.id.divide);
+        ivClean = view.findViewById(R.id.iv_clean);
+
+        ivClean.setVisibility(View.GONE);
+        divide.setVisibility(View.GONE);
 
         //添加标题
         htTabs.clear();
@@ -104,7 +112,7 @@ public class HtGestureFrameFragment extends HtBaseFragment {
         container.setBackground(ContextCompat.getDrawable(getContext(),
             R.color.dark_background));
 
-        line.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.gray_line));
+        line.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.horizonal_line));
         //changeTheme("");
 
     }

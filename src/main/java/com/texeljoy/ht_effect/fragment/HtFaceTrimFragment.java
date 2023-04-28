@@ -133,7 +133,7 @@ public class HtFaceTrimFragment extends HtBaseLazyFragment {
   public void changeTheme(Object o) {
     if (HtState.isDark) {
       container.setBackground(ContextCompat.getDrawable(getContext(), R.color.dark_background));
-      line.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.gray_line));
+      line.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.divide_line));
       ivReset.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_reset_white));
       tvReset.setTextColor(ContextCompat.getColorStateList(getContext(), R.color.color_reset_text_white));
     } else {

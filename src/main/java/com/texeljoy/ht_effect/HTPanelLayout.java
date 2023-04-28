@@ -1,8 +1,12 @@
 package com.texeljoy.ht_effect;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +19,7 @@ import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -28,6 +33,7 @@ import com.hwangjr.rxbus.annotation.Tag;
 import com.hwangjr.rxbus.thread.EventThread;
 import com.texeljoy.ht_effect.fragment.HtARPropsFragment;
 import com.texeljoy.ht_effect.fragment.HtBeautyFragment;
+import com.texeljoy.ht_effect.fragment.HtFilterFragment;
 import com.texeljoy.ht_effect.fragment.HtGestureFrameFragment;
 import com.texeljoy.ht_effect.fragment.HtModeFragment;
 import com.texeljoy.ht_effect.fragment.HtPortraitFragment;
@@ -40,8 +46,15 @@ import com.texeljoy.ht_effect.utils.DpUtils;
 import com.texeljoy.ht_effect.utils.HtConfigTools;
 import com.texeljoy.ht_effect.utils.HtUICacheUtils;
 import com.texeljoy.ht_effect.utils.SharedPreferencesUtil;
+import com.texeljoy.ht_effect.view.HtResetAllDialog;
+import com.texeljoy.ht_effect.view.HtTakephotoButton;
+import com.texeljoy.ht_effect.view.HtTakephotoButton.OnProgressTouchListener;
 import java.util.Timer;
 import java.util.TimerTask;
+import texeljoy.stickerview.StickerView;
+
+import static com.texeljoy.ht_effect.utils.HtUICacheUtils.previewInitialHeight;
+import static com.texeljoy.ht_effect.utils.HtUICacheUtils.previewInitialWidth;
 
 /**
  * 美颜面板主体
@@ -52,6 +65,9 @@ public class HTPanelLayout extends ConstraintLayout
     implements ValueAnimator.AnimatorUpdateListener {
 
   private AppCompatImageView ivHtTrigger;
+  private AppCompatImageView ivHtRestore;
+
+  private final HtResetAllDialog resetAllDialog = new HtResetAllDialog();
 
   private final ValueAnimator showAnim =
       ValueAnimator.ofFloat(DpUtils.dip2px(320), 0);
@@ -68,14 +84,26 @@ public class HTPanelLayout extends ConstraintLayout
   public void setBtnShutterClick(BtnShutterClick btnShutterClick) {
     this.btnShutterClick = btnShutterClick;
   }
+  public void setBtnShutterLongClick(BtnShutterLongClick btnShutterLongClick) {
+    this.btnShutterLongClick = btnShutterLongClick;
+  }
 
   private BtnShutterClick btnShutterClick;
+  private BtnShutterLongClick btnShutterLongClick;
 
   private View controllerView;
   private AppCompatImageView btnShutter;
+  private HtTakephotoButton btnShutter1;
   private AppCompatImageView shutterIv;
   private AppCompatTextView tvFilterType;
   private TextView tiInteractionHint;
+
+  private StickerView stickerView;
+  private DisplayMetrics dm;
+  private int[] mWatermarkSize;
+  private boolean isWaterMarkFocus = false;
+
+
 
   public HTPanelLayout(@NonNull Context context) {
     super(context);
@@ -173,18 +201,25 @@ public class HTPanelLayout extends ConstraintLayout
   private void initView() {
     LayoutInflater.from(getContext()).inflate(R.layout.layout_ht_panel, this);
     ivHtTrigger = findViewById(R.id.iv_ht_trigger);
+    ivHtRestore = findViewById(R.id.iv_ht_restore);
     controllerView = findViewById(R.id.controller_view);
     btnShutter = findViewById(R.id.btn_shutter);
+    btnShutter1 = findViewById(R.id.btn_shutter1);
     shutterIv = findViewById(R.id.shutter_iv);
     tvFilterType = findViewById(R.id.tv_filter_tip);
     tiInteractionHint = findViewById(R.id.interaction_hint);
+    stickerView = findViewById(R.id.sl_sticker_layout);
+    stickerView.setMinStickerSizeScale(0.9f);
     //初始化View的时候记得把美颜的参数进行应用
     HtUICacheUtils.initCache(true);
+    //获取屏幕宽高
+    dm = getContext().getResources().getDisplayMetrics();
+
   }
 
   ///版本检测
   private void checkVersion() {
-    String curVersion = "1.0";
+    String curVersion = "1.2.0";
 
     // String oldVersion = KvUtils.get().getString("mt_version");
 
@@ -207,7 +242,7 @@ public class HTPanelLayout extends ConstraintLayout
     if (showFilterTipTimer != null) {
       showFilterTipTimer.cancel();
     }
-    tvFilterType.setText(HtState.currentFilter.getTitle());
+    tvFilterType.setText(HtState.currentStyleFilter.getTitle());
     tvFilterType.setVisibility(VISIBLE);
     showFilterTipTimer = new Timer();
     showFilterTipTimer.schedule(new TimerTask() {
@@ -229,14 +264,64 @@ public class HTPanelLayout extends ConstraintLayout
     changeTheme(null);
     replaceView(new HtModeFragment(),"");
 
-    btnShutter.setOnClickListener(new OnClickListener() {
-      @Override public void onClick(View v) {
-        //点击拍照
+
+
+    // btnShutter.setOnClickListener(new OnClickListener() {
+    //   @Override public void onClick(View v) {
+    //     //点击拍照
+    //     if (btnShutterClick != null) {
+    //       btnShutterClick.clickShutter();
+    //     }
+    //   }
+    // });
+
+    btnShutter1.setOnProgressTouchListener(new OnProgressTouchListener() {
+      @Override public void onClick(HtTakephotoButton photoButton) {
         if (btnShutterClick != null) {
           btnShutterClick.clickShutter();
         }
       }
+
+      @Override public void onLongClick(HtTakephotoButton photoButton) {
+
+        if (btnShutterLongClick != null) {
+                  btnShutterLongClick.startVideo();
+                }
+        btnShutter1.start();
+      }
+
+      @Override public void onLongClickUp(HtTakephotoButton photoButton) {
+              if (btnShutterLongClick != null) {
+                btnShutterLongClick.stopVideo();
+              }
+
+
+      }
+
+      @Override public void onFinish() {
+
+      }
     });
+
+    // btnShutter.setOnTouchListener(new OnTouchListener() {
+    //   @Override public boolean onTouch(View v, MotionEvent event) {
+    //     if(event.getAction() == MotionEvent.ACTION_DOWN) {
+    //       if (btnShutterLongClick != null) {
+    //         btnShutterLongClick.startVideo();
+    //       }
+    //     } else if (event.getAction() == MotionEvent.ACTION_UP) {
+    //       if (btnShutterLongClick != null) {
+    //         btnShutterLongClick.stopVideo();
+    //       }
+    //     }
+    //     return true;
+    //   }
+    // });
+
+
+
+
+
 
     shutterIv.setOnClickListener(new OnClickListener() {
       @Override public void onClick(View v) {
@@ -253,6 +338,33 @@ public class HTPanelLayout extends ConstraintLayout
       }
     });
 
+    ivHtRestore.setOnClickListener(new OnClickListener() {
+      @Override public void onClick(View view) {
+        resetAllDialog.show(fm, "all");
+      }
+    });
+
+
+    stickerView.setOnTouchListener(new OnTouchListener() {
+      @Override public boolean onTouch(View v, MotionEvent event) {
+            v.performClick();
+            isWaterMarkFocus = false;
+        isWaterMarkFocus = stickerView.getIsFocus();
+        Log.d("lu123456", "onTouch: "+isWaterMarkFocus);
+        if(event.getAction() == MotionEvent.ACTION_UP && isWaterMarkFocus == false){
+          Log.e("click","--||--");
+          backContainer();
+          return true;
+        }
+
+        return false;
+      }
+    });
+    // stickerView.setOnClickListener(new OnClickListener() {
+    //   @Override public void onClick(View v) {
+    //     backContainer();
+    //   }
+    // });
     //空白处隐藏面板
     setOnTouchListener(new OnTouchListener() {
       @Override
@@ -265,6 +377,31 @@ public class HTPanelLayout extends ConstraintLayout
         return false;
       }
     });
+  }
+
+
+  //开始按下按钮动画
+  public void startButtonAnima(){
+    AnimatorSet animatorSet = new AnimatorSet();//组合动画
+    ObjectAnimator scaleX = ObjectAnimator.ofFloat(shutterIv, "scaleX", 1f, 1.3f);
+    ObjectAnimator scaleY = ObjectAnimator.ofFloat(shutterIv, "scaleY", 1f, 1.3f);
+
+    animatorSet.setDuration(100);
+    animatorSet.setInterpolator(new LinearInterpolator());
+    animatorSet.play(scaleX).with(scaleY);//两个动画同时开始
+    animatorSet.start();
+  }
+
+  //停止按下按钮动画
+  public void stopButtonAnima() {
+    AnimatorSet animatorSet = new AnimatorSet();//组合动画
+    ObjectAnimator scaleX = ObjectAnimator.ofFloat(shutterIv, "scaleX", 1.3f, 1f);
+    ObjectAnimator scaleY = ObjectAnimator.ofFloat(shutterIv, "scaleY", 1.3f, 1f);
+
+    animatorSet.setDuration(100);
+    animatorSet.setInterpolator(new LinearInterpolator());
+    animatorSet.play(scaleX).with(scaleY);//两个动画同时开始
+    animatorSet.start();
   }
 
   /**
@@ -281,7 +418,7 @@ public class HTPanelLayout extends ConstraintLayout
         break;
       //二级面板
       case BEAUTY:
-      case BEAUTY_FILTER:
+      case FILTER:
       case AR:
       case ThreeD:
       case GESTURE:
@@ -314,7 +451,9 @@ public class HTPanelLayout extends ConstraintLayout
 
       @Override public void onAnimationEnd(Animator animation) {
         ivHtTrigger.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.VISIBLE);
+        ivHtRestore.setVisibility(View.VISIBLE);
+        // btnShutter.setVisibility(View.VISIBLE);
+        stickerView.setVisibility(View.GONE);
         //动画监听器用完记得回收,避免内存泄漏
         hideAnim.removeListener(this);
       }
@@ -351,17 +490,23 @@ public class HTPanelLayout extends ConstraintLayout
   public void changeTheme(Object o) {
     if (HtState.isDark) {
       btnShutter.setImageDrawable(ContextCompat
-          .getDrawable(getContext(), R.drawable.ic_shutter_dark));
+          .getDrawable(getContext(), R.drawable.icon_home_shutter_dark));
+      ivHtRestore.setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.icon_restore_all_black));
       ivHtTrigger.setImageDrawable(ContextCompat
           .getDrawable(getContext(), R.mipmap.ic_trigger_white));
     } else {
       btnShutter.setImageDrawable(ContextCompat
-          .getDrawable(getContext(), R.mipmap.icon_shutter_light));
+          .getDrawable(getContext(), R.drawable.icon_home_shutter_light));
+      ivHtRestore.setImageDrawable(ContextCompat.getDrawable(getContext(),R.drawable.icon_restore_all_white));
       ivHtTrigger.setImageDrawable(ContextCompat
           .getDrawable(getContext(), R.mipmap.ic_trigger_black));
     }
   }
 
+  public void setWatermarkSize(int[] watermarkSize){
+    mWatermarkSize = watermarkSize;
+
+  }
   //切换面板
   @Subscribe(thread = EventThread.MAIN_THREAD,
              tags = { @Tag(HTEventAction.ACTION_CHANGE_PANEL) })
@@ -371,77 +516,97 @@ public class HTPanelLayout extends ConstraintLayout
     switch (viewState) {
       case HIDE:
         hideContainer();
+        stickerView.setVisibility(GONE);
         break;
 
       case MODE:
         ivHtTrigger.setVisibility(View.GONE);
-        //btnShutter.setVisibility(View.GONE);
+        ivHtRestore.setVisibility(View.GONE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
         if (HtState.currentViewState == HTViewState.HIDE) {
           showModePanel();
         } else {
           Log.e("change_Panel:", "Mode_Fragment");
           switchModePanel(new HtModeFragment(),"");
-          //shutterIv.setVisibility(View.GONE);
-          RxBus.get().post(HTEventAction.ACTION_STYLE_SELECTED,"");
+          shutterIv.setVisibility(View.GONE);
         }
         HtState.currentViewState = viewState;
+        //setTakePhotoAnim(-200);
         break;
 
       case BEAUTY:
         ivHtTrigger.setVisibility(View.GONE);
-        //shutterIv.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.GONE);
+        ivHtRestore.setVisibility(View.GONE);
+        shutterIv.setVisibility(View.VISIBLE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtBeautyFragment(),"beauty");
         HtState.currentViewState = viewState;
         HtState.currentSecondViewState = HTViewState.BEAUTY_SKIN;
         Log.e("--Beauty--",viewState.name());
+        //setTakePhotoAnim(-320);
         break;
 
       case AR:
         ivHtTrigger.setVisibility(GONE);
-        //shutterIv.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.GONE);
+        ivHtRestore.setVisibility(GONE);
+        shutterIv.setVisibility(View.VISIBLE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtARPropsFragment(),"ar");
         HtState.currentViewState = viewState;
         HtState.currentAR = HTViewState.AR_PROP;
         Log.e("--AR--",viewState.name());
+        //setTakePhotoAnim(-280);
         break;
 
       case ThreeD:
         ivHtTrigger.setVisibility(View.GONE);
-        //shutterIv.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.GONE);
+        ivHtRestore.setVisibility(View.GONE);
+        shutterIv.setVisibility(View.VISIBLE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtThreeDFragment(),"threed");
         HtState.currentViewState = viewState;
         Log.e("--Make Up--",viewState.name());
+        //setTakePhotoAnim(-200);
         break;
 
       case GESTURE:
         ivHtTrigger.setVisibility(View.GONE);
-        //shutterIv.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.GONE);
+        ivHtRestore.setVisibility(View.GONE);
+        shutterIv.setVisibility(View.VISIBLE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtGestureFrameFragment(),"gesture");
         HtState.currentViewState = viewState;
         Log.e("--Gesture--",viewState.name());
+        //setTakePhotoAnim(-200);
         break;
 
       case PORTRAIT:
         ivHtTrigger.setVisibility(View.GONE);
-        //shutterIv.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.GONE);
+        ivHtRestore.setVisibility(View.GONE);
+        shutterIv.setVisibility(View.VISIBLE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtPortraitFragment(),"portrait");
         HtState.currentViewState = viewState;
         Log.e("--Portrait--",viewState.name());
+        //setTakePhotoAnim(-200);
         break;
 
-      case BEAUTY_FILTER:
+      case FILTER:
         ivHtTrigger.setVisibility(View.GONE);
-        //shutterIv.setVisibility(View.VISIBLE);
-        //btnShutter.setVisibility(View.GONE);
-        switchModePanel(new HtBeautyFragment(),"beauty_filter");
-        HtState.currentViewState = HTViewState.BEAUTY;
-        HtState.currentSecondViewState = HTViewState.BEAUTY_FILTER;
+        ivHtRestore.setVisibility(View.GONE);
+        shutterIv.setVisibility(View.VISIBLE);
+        btnShutter.setVisibility(View.GONE);
+        stickerView.setVisibility(VISIBLE);
+        switchModePanel(new HtFilterFragment(),"filter");
+        HtState.currentViewState = HTViewState.FILTER;
         Log.e("--Filter--",viewState.name());
+        // setTakePhotoAnim(-200);
         break;
     }
 
@@ -486,6 +651,24 @@ public class HTPanelLayout extends ConstraintLayout
   }
 
   /**
+   * 添加贴纸的提示框
+   * @param mBitmap
+   */
+  @Subscribe(thread = EventThread.MAIN_THREAD,
+             tags = { @Tag(HTEventAction.ACTION_ADD_STICKER_RECT) })
+  public void addRect(Bitmap mBitmap) {
+    BitmapDrawable drawable = new BitmapDrawable(mBitmap);
+
+    // Sticker sticker = new Sticker(getContext(),mBitmap);
+    stickerView.setScreenSize(previewInitialHeight(),previewInitialWidth());
+    // mStickerLayout = new StickerLayout(getContext(),mStickerLayout.getWidth(),mStickerLayout.getHeight());
+    stickerView.addSticker(drawable);
+
+  }
+
+
+
+  /**
    * 设置面板动画
    * @param dpValue
    */
@@ -512,8 +695,8 @@ public class HTPanelLayout extends ConstraintLayout
     showAnim.addListener(new Animator.AnimatorListener() {
       @Override public void onAnimationStart(Animator animator) {
         replaceView(new HtModeFragment(),"");
-        //btnShutter.setVisibility(View.GONE);
-        //shutterIv.setVisibility(View.GONE);
+        btnShutter.setVisibility(View.GONE);
+        shutterIv.setVisibility(View.GONE);
         showAnim.removeListener(this);
       }
 
@@ -566,7 +749,28 @@ public class HTPanelLayout extends ConstraintLayout
         showAnim.start();
         hideAnim.removeListener(this);
 
-        //此前点击空白处隐藏面板被禁用，此处需放开
+        stickerView.setOnTouchListener(new OnTouchListener() {
+          @Override public boolean onTouch(View v, MotionEvent event) {
+            // isWaterMarkFocus = stickerView.getIsFocus();
+            isWaterMarkFocus = false;
+            isWaterMarkFocus = stickerView.getIsFocus();
+            Log.d("lu123456", "onTouch: "+isWaterMarkFocus);
+            v.performClick();
+            if(event.getAction() == MotionEvent.ACTION_UP && isWaterMarkFocus == false ){
+              Log.e("click","--||--");
+              backContainer();
+              return true;
+            }
+            return false;
+          }
+        });
+        // stickerView.setOnClickListener(new OnClickListener() {
+        //   @Override public void onClick(View v) {
+        //     backContainer();
+        //   }
+        // });
+
+        // 此前点击空白处隐藏面板被禁用，此处需放开
         setOnTouchListener(new OnTouchListener() {
           @Override
           public boolean onTouch(View v, MotionEvent event) {
@@ -627,6 +831,11 @@ public class HTPanelLayout extends ConstraintLayout
   public interface BtnShutterClick {
     //点击拍照按钮的回调
     void clickShutter();
+  }
+  public interface BtnShutterLongClick {
+
+    void startVideo();
+    void stopVideo();
   }
 
 }

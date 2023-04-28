@@ -68,6 +68,8 @@ public class HtSkinItem extends LinearLayout {
     //同步滑动条
     RxBus.get().post(HTEventAction.ACTION_SYNC_PROGRESS, "");
 
+
+
     setOnClickListener(new OnClickListener() {
       @Override public void onClick(View v) {
 

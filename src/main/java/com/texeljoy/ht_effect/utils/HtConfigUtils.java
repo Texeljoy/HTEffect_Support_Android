@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import com.texeljoy.hteffect.HTEffect;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,12 +40,12 @@ public class HtConfigUtils {
   public static void init(@NonNull Context context) {
     jsonWriterThread.start();
 
+    //todo 这个地方原本是maskpath
+    // PATH_FILTER = HTEffect.shareInstance().getStickerPath() + File.separator + "filter.json";
 
-    PATH_FILTER = HTEffect.shareInstance().getStickerPath() + File.separator + "filter.json";
+    // PATH_MAKE_UP = HTEffect.shareInstance().getStickerPath() + File.separator + "make_up.json";
 
-    PATH_MAKE_UP = HTEffect.shareInstance().getStickerPath() + File.separator + "make_up.json";
-
-    PTAH_STYLE = HTEffect.shareInstance().getStickerPath() + File.separator + "style.json";
+    // PTAH_STYLE = HTEffect.shareInstance().getStickerPath() + File.separator + "style.json";
 
   }
 

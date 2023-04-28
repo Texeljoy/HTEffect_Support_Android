@@ -60,7 +60,7 @@ public class HtStyleItemViewBinder
         HtUICacheUtils.beautyStylePosition(getPosition(holder));
         //应用参数
 
-        HTEffect.shareInstance().setStyle(item.getParam(),100);
+        HTEffect.shareInstance().setStyle(item.getParam());
         if(item == HtStyle.YUAN_TU){
           HtUICacheUtils.initCache(false);
           RxBus.get().post(HTEventAction.ACTION_CHANGE_ENABLE,"");
