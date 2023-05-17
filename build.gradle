@@ -45,6 +45,7 @@ dependencies {
   implementation 'com.android.support.constraint:constraint-layout:2.0.4'
   implementation 'com.android.support:support-v4:28.0.0'
   implementation 'com.alibaba.android.mnnkit:facedetection:0.0.4'
+//  implementation project(':stickerview')
 //  implementation 'com.github.c786909486:PhotoButton2:v1.1'
 //  implementation 'com.lcw.library:StickeView:1.0.1'
 
