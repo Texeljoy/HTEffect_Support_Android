@@ -457,7 +457,7 @@ public class HTPanelLayout extends ConstraintLayout
       @Override public void onAnimationEnd(Animator animation) {
         ivHtTrigger.setVisibility(View.VISIBLE);
         ivHtRestore.setVisibility(View.VISIBLE);
-        btnShutter.setVisibility(View.VISIBLE);
+        // btnShutter.setVisibility(View.VISIBLE);
         stickerView.setVisibility(View.GONE);
         //动画监听器用完记得回收,避免内存泄漏
         hideAnim.removeListener(this);
@@ -543,7 +543,7 @@ public class HTPanelLayout extends ConstraintLayout
       case BEAUTY:
         ivHtTrigger.setVisibility(View.GONE);
         ivHtRestore.setVisibility(View.GONE);
-        shutterIv.setVisibility(View.VISIBLE);
+        // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtBeautyFragment(),"beauty");
@@ -556,7 +556,7 @@ public class HTPanelLayout extends ConstraintLayout
       case AR:
         ivHtTrigger.setVisibility(GONE);
         ivHtRestore.setVisibility(GONE);
-        shutterIv.setVisibility(View.VISIBLE);
+        // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtARPropsFragment(),"ar");
@@ -569,7 +569,7 @@ public class HTPanelLayout extends ConstraintLayout
       case ThreeD:
         ivHtTrigger.setVisibility(View.GONE);
         ivHtRestore.setVisibility(View.GONE);
-        shutterIv.setVisibility(View.VISIBLE);
+        // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtThreeDFragment(),"threed");
@@ -581,7 +581,7 @@ public class HTPanelLayout extends ConstraintLayout
       case GESTURE:
         ivHtTrigger.setVisibility(View.GONE);
         ivHtRestore.setVisibility(View.GONE);
-        shutterIv.setVisibility(View.VISIBLE);
+        // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtGestureFrameFragment(),"gesture");
@@ -593,7 +593,7 @@ public class HTPanelLayout extends ConstraintLayout
       case PORTRAIT:
         ivHtTrigger.setVisibility(View.GONE);
         ivHtRestore.setVisibility(View.GONE);
-        shutterIv.setVisibility(View.VISIBLE);
+        // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtPortraitFragment(),"portrait");
@@ -605,7 +605,7 @@ public class HTPanelLayout extends ConstraintLayout
       case FILTER:
         ivHtTrigger.setVisibility(View.GONE);
         ivHtRestore.setVisibility(View.GONE);
-        shutterIv.setVisibility(View.VISIBLE);
+        // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
         switchModePanel(new HtFilterFragment(),"filter");
