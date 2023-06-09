@@ -289,6 +289,7 @@ public class HtWatermarkAdapter extends RecyclerView.Adapter<HtStickerViewHolder
                         notifyItemChanged(deletePosition);
                         deletePosition = -1;
                     }
+                    RxBus.get().post(HTEventAction.ACTION_SYNC_PROGRESS, "");
 
                 }
             });

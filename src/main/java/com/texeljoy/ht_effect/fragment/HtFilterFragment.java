@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import com.hwangjr.rxbus.annotation.Subscribe;
 import com.hwangjr.rxbus.annotation.Tag;
@@ -49,7 +48,7 @@ public class HtFilterFragment extends HtBaseFragment {
   private View divide;
   private RelativeLayout bottomLayout;
   private AppCompatImageView returnIv;
-  private ImageView cleanIv;
+  private AppCompatImageView cleanIv;
   private String which;
   private HtBarView barView;
 

@@ -289,6 +289,7 @@ isRenderInit = false;
 
 ## **Recent updates**
 
+
 - **2023.05.17:** New 2.0 version
 
   - More than 30 new styles of filters, special effect filters, and distorting mirror
