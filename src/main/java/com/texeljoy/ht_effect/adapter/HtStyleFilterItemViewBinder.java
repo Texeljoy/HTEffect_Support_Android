@@ -18,7 +18,6 @@ import com.texeljoy.ht_effect.R;
 import com.texeljoy.ht_effect.model.HTEventAction;
 import com.texeljoy.ht_effect.model.HtState;
 import com.texeljoy.ht_effect.model.HtStyleFilterConfig;
-import com.texeljoy.ht_effect.model.HtStyleFilterEnum;
 import com.texeljoy.ht_effect.utils.HtUICacheUtils;
 import com.texeljoy.ht_effect.view.HtRoundImageView;
 import com.texeljoy.hteffect.HTEffect;
@@ -55,8 +54,12 @@ public class HtStyleFilterItemViewBinder extends ItemViewBinder<HtStyleFilterCon
     // drawable.setCornerRadius(10);
     // holder.thumbIV.setImageDrawable(drawable);
 
+    String resName = "ic_filter_" + item.getName();
+    int resID = holder.itemView.getResources().getIdentifier(resName, "drawable",
+        holder.itemView.getContext().getPackageName());
+
     Glide.with(holder.itemView.getContext())
-        .load(HtStyleFilterEnum.values()[getPosition(holder)].getIconRes())
+        .load(resID)
         // .placeholder(R.drawable.icon_placeholder)
         .into(holder.thumbIV);
     // holder.thumbIV.setImageDrawable(HtStyleFilterEnum.values()[getPosition(holder)].getIcon(holder.itemView.getContext()));

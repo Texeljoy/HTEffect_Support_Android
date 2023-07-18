@@ -12,11 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import com.bumptech.glide.Glide;
 import com.hwangjr.rxbus.RxBus;
 import com.texeljoy.ht_effect.R;
 import com.texeljoy.ht_effect.model.HTEventAction;
 import com.texeljoy.ht_effect.model.HtEffectFilterConfig;
-import com.texeljoy.ht_effect.model.HtEffectFilterEnum;
 import com.texeljoy.ht_effect.model.HtState;
 import com.texeljoy.ht_effect.utils.HtUICacheUtils;
 import com.texeljoy.hteffect.HTEffect;
@@ -48,7 +48,13 @@ public class HtEffectFilterItemViewBinder extends ItemViewBinder<HtEffectFilterC
     holder.name.setTextColor(HtState.isDark ? Color.WHITE : ContextCompat
         .getColor(holder.itemView.getContext(),R.color.dark_black));
 
-    holder.thumbIV.setImageDrawable(HtEffectFilterEnum.values()[getPosition(holder)].getIcon(holder.itemView.getContext()));
+    String resName = item.getIcon().substring(0, item.getIcon().indexOf("."));
+    int resID = holder.itemView.getResources().getIdentifier(resName, "drawable",
+        holder.itemView.getContext().getPackageName());
+    Glide.with(holder.itemView.getContext())
+        .load(resID)
+        // .placeholder(R.drawable.icon_placeholder)
+        .into(holder.thumbIV);
 
     // holder.maker.setBackgroundColor(ContextCompat.getColor
     //     (holder.itemView.getContext(), R.color.makeup_maker));

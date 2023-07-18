@@ -37,7 +37,7 @@ import com.texeljoy.ht_effect.fragment.HtFilterFragment;
 import com.texeljoy.ht_effect.fragment.HtGestureFrameFragment;
 import com.texeljoy.ht_effect.fragment.HtModeFragment;
 import com.texeljoy.ht_effect.fragment.HtPortraitFragment;
-import com.texeljoy.ht_effect.fragment.HtThreeDFragment;
+import com.texeljoy.ht_effect.fragment.HtThreedFrameFragment;
 import com.texeljoy.ht_effect.model.HTEventAction;
 import com.texeljoy.ht_effect.model.HTViewState;
 import com.texeljoy.ht_effect.model.HtState;
@@ -50,6 +50,7 @@ import com.texeljoy.ht_effect.utils.SharedPreferencesUtil;
 import com.texeljoy.ht_effect.view.HtResetAllDialog;
 import com.texeljoy.ht_effect.view.HtTakephotoButton;
 import com.texeljoy.ht_effect.view.HtTakephotoButton.OnProgressTouchListener;
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 import texeljoy.stickerview.StickerView;
@@ -103,6 +104,7 @@ public class HTPanelLayout extends ConstraintLayout
   private DisplayMetrics dm;
   private int[] mWatermarkSize;
   private boolean isWaterMarkFocus = false;
+  private boolean isForThreed = false;
 
 
 
@@ -223,13 +225,17 @@ public class HTPanelLayout extends ConstraintLayout
 
   ///版本检测
   private void checkVersion() {
-    String curVersion = "1.2.0";
+    String curVersion = "2.1.0";
 
     // String oldVersion = KvUtils.get().getString("mt_version");
 
     // if (oldVersion.equals("") || Float.parseFloat(curVersion) > Float.parseFloat(oldVersion)) {
     //
     // }
+  }
+
+  public void setIsThreed(boolean isForThreed){
+    this.isForThreed = isForThreed;
   }
 
   //view被销毁时
@@ -340,7 +346,12 @@ public class HTPanelLayout extends ConstraintLayout
 
     ivHtTrigger.setOnClickListener(new OnClickListener() {
       @Override public void onClick(View view) {
-        showPanel(HTViewState.MODE);
+        if(isForThreed){
+          showPanel(HTViewState.ThreeD);
+        }else{
+          showPanel(HTViewState.MODE);
+        }
+
       }
     });
 
@@ -425,10 +436,12 @@ public class HTPanelLayout extends ConstraintLayout
       case BEAUTY:
       case FILTER:
       case AR:
-      case ThreeD:
       case GESTURE:
       case PORTRAIT:
         showPanel(HTViewState.MODE);
+        break;
+      case ThreeD:
+        hideContainer();
         break;
     }
   }
@@ -572,9 +585,9 @@ public class HTPanelLayout extends ConstraintLayout
         // shutterIv.setVisibility(View.VISIBLE);
         btnShutter.setVisibility(View.GONE);
         stickerView.setVisibility(VISIBLE);
-        switchModePanel(new HtThreeDFragment(),"threed");
+        switchModePanel(new HtThreedFrameFragment(),"threed");
         HtState.currentViewState = viewState;
-        Log.e("--Make Up--",viewState.name());
+        Log.e("--ThreeD--",viewState.name());
         //setTakePhotoAnim(-200);
         break;
 
@@ -833,6 +846,20 @@ public class HTPanelLayout extends ConstraintLayout
         controllerView.setTranslationY(offsetY);
       }
     });
+  }
+  /**
+   * 获取资源路径
+   *
+   * @param context 上下文
+   * @return 资源路径
+   */
+  public static String getResPath(Context context) {
+    String path = null;
+    File dataDir = context.getApplicationContext().getFilesDir();
+    if (dataDir != null) {
+      path = dataDir.getAbsolutePath();
+    }
+    return path;
   }
 
   /**
