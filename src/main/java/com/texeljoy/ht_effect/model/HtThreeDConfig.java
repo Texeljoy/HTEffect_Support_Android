@@ -57,7 +57,7 @@ public class HtThreedConfig {
 
     public String getIcon() {
       // return HTEffectAR.shareInstance().getResourcePath()  + "/hteffect/3d_effect" + "/ht_3d_effect_icon/" + this.icon;
-      return "";
+    return "";
     }
 
     public void setIcon(String icon) { this.icon = icon;}
