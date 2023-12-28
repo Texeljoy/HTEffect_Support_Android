@@ -1,20 +1,16 @@
 package com.texeljoy.ht_effect.utils;
 
-import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
+import com.texeljoy.ht_effect.R;
 
 /**
  * @ClassName HtUploadBitmapUtils
@@ -31,7 +27,7 @@ public class HtUploadBitmapUtils {
         if (uri == null) return null;
         String imagePath = getImagePath(uri, null, activity);
         if (!isPng(imagePath)) {
-            Toast.makeText(activity.getBaseContext(), "暂时只兼容png格式的背景图", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getBaseContext(), R.string.only_png_images, Toast.LENGTH_SHORT).show();
             return null;
         }
         return imagePath;

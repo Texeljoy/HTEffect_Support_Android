@@ -282,6 +282,8 @@ public class HTPanelLayout extends ConstraintLayout
 
 
 
+
+
     // btnShutter.setOnClickListener(new OnClickListener() {
     //   @Override public void onClick(View v) {
     //     //点击拍照
@@ -536,6 +538,8 @@ public class HTPanelLayout extends ConstraintLayout
     mWatermarkSize = watermarkSize;
 
   }
+
+
   //切换面板
   @Subscribe(thread = EventThread.MAIN_THREAD,
              tags = { @Tag(HTEventAction.ACTION_CHANGE_PANEL) })
