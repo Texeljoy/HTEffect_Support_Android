@@ -110,7 +110,7 @@ public class HtResetDialog extends DialogFragment {
         }
 
         if (HtState.currentSecondViewState == HTViewState.BEAUTY_MAKE_UP) {
-          //当前是美体
+          //当前是美妆
           for(int i = 0; i < 7; i++){
             HtUICacheUtils.resetMakeUpValue(getContext(),i);
           }

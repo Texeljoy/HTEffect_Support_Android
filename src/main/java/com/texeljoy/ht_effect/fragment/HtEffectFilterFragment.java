@@ -80,7 +80,7 @@ public class HtEffectFilterFragment extends HtBaseLazyFragment {
     listAdapter.register(HtEffectFilter.class, new HtEffectFilterItemViewBinder());
     listAdapter.setItems(items);
     rvFilter.setAdapter(listAdapter);
-    rvFilter.smoothScrollToPosition(HtUICacheUtils.beautyEffectFilterPosition());
+    rvFilter.smoothScrollToPosition(HtUICacheUtils.getEffectFilterPosition());
     //sync progress
     RxBus.get().post(HTEventAction.ACTION_SYNC_PROGRESS, "");
   }
@@ -105,6 +105,7 @@ public class HtEffectFilterFragment extends HtBaseLazyFragment {
     super.onFragmentStartLazy();
     //更新ui状态
     HtState.currentSecondViewState = HTViewState.FILTER;
+    HtState.currentSliderViewState = HTViewState.FILTER_EFFECT;
     //同步滑动条
     RxBus.get().post(HTEventAction.ACTION_SYNC_PROGRESS, "");
     listAdapter.notifyDataSetChanged();
